@@ -1,6 +1,6 @@
 pragma solidity 0.8.12;
 
-import "@openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract VoteToken is ERC20("Vote Token", "vToken") {
     address public owner;
@@ -32,11 +32,13 @@ contract VoteToken is ERC20("Vote Token", "vToken") {
     }
 
     // currentDelegate and delegatee
-    // @audit it is possible underflow?
+    // @audit if here from is == 0, nothing happens
+
     function _moveDelegates(address from, address to, uint256 amount) internal {
         if (from != to && amount > 0) {
             if (from != address(0)) {
                 uint32 fromNum = numCheckpoints[from];
+                // if from its 0 what happens?
                 uint256 fromOld = fromNum > 0
                     ? checkpoints[from][fromNum - 1].votes
                     : 0;
@@ -45,6 +47,7 @@ contract VoteToken is ERC20("Vote Token", "vToken") {
             }
 
             if (to != address(0)) {
+                // @audit here _writeCheckpoint is updated
                 uint32 toNum = numCheckpoints[to];
                 uint256 toOld = toNum > 0
                     ? checkpoints[to][toNum - 1].votes
@@ -75,6 +78,7 @@ contract VoteToken is ERC20("Vote Token", "vToken") {
     //  _addr(msg.sender)  _addr(delegatee)
     // @audit What if we pass in the same address for both?
     function _delegate(address _addr, address delegatee) internal {
+        // First _delegates will be address(0)
         address currentDelegate = _delegates[_addr];
         // What's this balanceOf?
         uint256 _addrBalance = balanceOf(_addr);

