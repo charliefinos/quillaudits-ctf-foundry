@@ -77,6 +77,7 @@ contract VoteToken is ERC20("Vote Token", "vToken") {
 
     //  _addr(msg.sender)  _addr(delegatee)
     // @audit What if we pass in the same address for both?
+    // If currentDelegate is 0, it's not initialized
     function _delegate(address _addr, address delegatee) internal {
         // First _delegates will be address(0)
         address currentDelegate = _delegates[_addr];
